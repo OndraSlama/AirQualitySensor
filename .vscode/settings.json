@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"*.js": "javascriptreact",
+		"myc02sensor": "cpp"
+	}
+}
