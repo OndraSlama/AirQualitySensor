@@ -6,7 +6,7 @@ char response[9];  // holds the recieved data
 
 
 unsigned long warmingTimer = 0;
-unsigned long warmUpTime = 150000;
+unsigned long warmUpTime = 60000;
 unsigned long maxWaitTime = 3000;
 
 void co2Init(){
