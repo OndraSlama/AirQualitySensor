@@ -3,6 +3,7 @@
 #include "myLcd.h"
 #include "myCO2Sensor.h"
 #include "myWifi.h"
+#include "myDateTime.h"	
 
 #include <PubSubClient.h>
 
@@ -18,6 +19,7 @@
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 DHTesp dht;
+
 
 void setup()
 {
@@ -52,6 +54,7 @@ void setup()
 		lcdPrint("InfluxDB failed", 0, 0, true);
 	}
 
+	setupDatetime();
 }
 
 void reconnect() {
@@ -72,6 +75,7 @@ void reconnect() {
 
 void loop()
 {
+	// Check MQTT connection
 	if (!mqttClient.connected()) {
 		lcdPrint("Reconnecting MQTT", 1, 0);
 		reconnect();
@@ -82,40 +86,47 @@ void loop()
 	float humidity = dht.getHumidity();
 	float temperature = dht.getTemperature();
 	int co2ppm = co2GetReading();	
-
+	String sensorReadings = String(humidity, 0) + "% " + String(temperature, 1) + "C " + String(co2ppm) + "ppm";
+	
 	lcdClear();
-	lcdPrint(String(humidity, 0) + "% " + String(temperature, 1) + "C " + String(co2ppm) + "ppm", 0, 0);
+	lcdPrint(getFormattedDate(), 0, 0);
+	lcdPrint(getFormattedTime(true), 0, 11);
+	lcdPrint(sensorReadings, 1, 0);
+
+
 
 	if (co2ppm == -1) {
 		lcdPrint("CO2 fail", 1, 0);
 	}
 
 	if (!co2IsReady() || co2ppm==500 || co2ppm > 5000) {	
-		lcdPrint("W", 1, 13);
+		// lcdPrint("W", 1, 13);
 		co2ppm = 0;	
 	}
 
-	lcdPrint("  ", 1, 14);
+	// lcdPrint("  ", 1, 14);
 
 	// Check WiFi connection	
 	if (!isWifiConnected()) {
-		lcdPrint("N", 1, 14);
+		// lcdPrint("N", 1, 14);
 		return;
 	}
-	lcdPrint("Y", 1, 14);
+	// lcdPrint("Y", 1, 14);
 
 	// Publish to MQTT
 	mqttClient.publish(temperature_topic, String(temperature).c_str(), true);
 	mqttClient.publish(humidity_topic, String(humidity).c_str(), true);
-	mqttClient.publish(co2_topic, String(co2ppm).c_str(), true);
+	if (co2ppm > 0){
+		mqttClient.publish(co2_topic, String(co2ppm).c_str(), true);
+	}
 
 	// Upload to influx db
 	if (influxClient.validateConnection()){
-		lcdPrint("Y", 1, 15);
+		// lcdPrint("Y", 1, 15);
 		uploadWifiStatus(WiFi.SSID(), WiFi.RSSI());
 		uploadAirQuality(temperature, humidity, co2ppm);
 	}else{
-		lcdPrint("N", 1, 15);
+		// lcdPrint("N", 1, 15);
 	}	
 }
 
