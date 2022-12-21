@@ -2,7 +2,7 @@
 #include <NTPClient.h>
 
 //Week Days
-String weekDays[7]={"Ne", "Po", "Út", "St", "Čt", "Pá", "So"};
+String weekDays[7]={"Ne", "Po", "Ut", "St", "Ct", "Pa", "So"};
 //Month names
 // String months[12]={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
