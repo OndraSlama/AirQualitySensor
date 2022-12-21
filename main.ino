@@ -20,6 +20,8 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 DHTesp dht;
 
+#define TEMPARATURE_OFFSET -1.05
+
 
 void setup()
 {
@@ -84,7 +86,7 @@ void loop()
 
 	// Get sensors data
 	float humidity = dht.getHumidity();
-	float temperature = dht.getTemperature();
+	float temperature = dht.getTemperature() + TEMPARATURE_OFFSET;
 	int co2ppm = co2GetReading();	
 	String sensorReadings = String(humidity, 0) + "% " + String(temperature, 1) + "C " + String(co2ppm) + "ppm";
 	
