@@ -20,6 +20,8 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 DHTesp dht;
 
+bool wifiConnected = false;
+
 #define TEMPARATURE_OFFSET -1.05
 
 
@@ -42,12 +44,7 @@ void setup()
 	registerAP("Dno Pytle", "ReadyForAnAdventure21");
 	registerAP("Dno Pytle 2", "ReadyForAnAdventure21");
 
-	lcdPrint("Connecting...");
-	if (connectToWifi()) {
-		lcdPrint("Wifi ok", 0, 0, true);
-	} else {
-		lcdPrint("Wifi failed", 0, 0, true);
-	}
+	wifiConnected = reconnectWifi();
 	
 	// Check server connection
 	if (influxClient.validateConnection()) {
@@ -59,7 +56,7 @@ void setup()
 	setupDatetime();
 }
 
-void reconnect() {
+void reconnectMqtt() {
   // Loop until we're reconnected
   while (!mqttClient.connected()) {
     lcdPrint("Connecting to MQTT...",  0, 0);
@@ -68,19 +65,39 @@ void reconnect() {
 	  delay(1000);
     } else {
       lcdPrint("MQTT failed",  0, 0, true);
-      lcdPrint("Reconnecting in 5s",  1, 0);
+      lcdPrint("Reconnect 5s",  1, 0);
       // Wait 5 seconds before retrying
       delay(5000);
     }
   }
 }
 
+bool reconnectWifi(){
+	if (connectToWifi()) {
+		lcdPrint("Wifi ok", 0, 0, true);
+		return true;
+	} else {
+		lcdPrint("Wifi connection", 0, 0, true);
+		lcdPrint("failed", 1);
+		return false;
+	}
+	
+}
+
 void loop()
 {
+	//check wifi connection
+	wifiConnected = isWifiConnected();
+	if (!wifiConnected) {
+		wifiConnected = reconnectWifi();
+		if (!wifiConnected) {
+			return;
+		}
+	}
 	// Check MQTT connection
 	if (!mqttClient.connected()) {
 		lcdPrint("Reconnecting MQTT", 1, 0);
-		reconnect();
+		reconnectMqtt();
 	}
 	mqttClient.loop();
 
