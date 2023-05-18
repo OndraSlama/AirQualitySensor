@@ -8,7 +8,7 @@
 #include <PubSubClient.h>
 
 
-#define mqtt_server "192.168.1.123"
+#define mqtt_server "192.168.68.120"
 #define mqtt_user "mqtt-user"
 #define mqtt_password "6^GAw7E7NCLuoWI"
 
@@ -43,6 +43,7 @@ void setup()
 	// Wifi
 	registerAP("Dno Pytle", "ReadyForAnAdventure21");
 	registerAP("Dno Pytle 2", "ReadyForAnAdventure21");
+	registerAP("Frazden", "doma1doma");
 
 	wifiConnected = reconnectWifi();
 	
