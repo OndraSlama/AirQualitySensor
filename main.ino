@@ -60,13 +60,12 @@ void setup()
 void reconnectMqtt() {
   // Loop until we're reconnected
   while (!mqttClient.connected()) {
-    lcdPrint("Connecting to MQTT...",  0, 0);
+    lcdPrint("MQTT...",  0, 0, true);
     if (mqttClient.connect("ESP8266Client", mqtt_user, mqtt_password)) {
       lcdPrint("MQTT connected",  0, 0, true);
 	  delay(1000);
     } else {
       lcdPrint("MQTT failed",  0, 0, true);
-      lcdPrint("Reconnect 5s",  1, 0);
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -87,6 +86,15 @@ bool reconnectWifi(){
 
 void loop()
 {
+	// Get sensors data
+	float humidity = dht.getHumidity();
+	float temperature = dht.getTemperature() + TEMPARATURE_OFFSET;
+	int co2ppm = co2GetReading();	
+	String sensorReadings = String(humidity, 0) + "% " + String(temperature, 1) + "C " + String(co2ppm) + "ppm";
+	
+	lcdClear();
+	lcdPrint(sensorReadings, 1, 0);
+
 	//check wifi connection
 	wifiConnected = isWifiConnected();
 	if (!wifiConnected) {
@@ -97,21 +105,14 @@ void loop()
 	}
 	// Check MQTT connection
 	if (!mqttClient.connected()) {
-		lcdPrint("Reconnecting MQTT", 1, 0);
+		lcdPrint("MQTT...", 0, 0, true);
 		reconnectMqtt();
 	}
 	mqttClient.loop();
 
-	// Get sensors data
-	float humidity = dht.getHumidity();
-	float temperature = dht.getTemperature() + TEMPARATURE_OFFSET;
-	int co2ppm = co2GetReading();	
-	String sensorReadings = String(humidity, 0) + "% " + String(temperature, 1) + "C " + String(co2ppm) + "ppm";
-	
-	lcdClear();
-	lcdPrint(getFormattedDate(), 0, 0);
+
+	lcdPrint(getFormattedDate(), 0, 0, true);
 	lcdPrint(getFormattedTime(true), 0, 11);
-	lcdPrint(sensorReadings, 1, 0);
 
 
 

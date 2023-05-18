@@ -13,9 +13,9 @@ void lcdInit() {
 	lcdPrint("Loading...");
 }
 
-void lcdPrint(String text, int line, int col, bool clear, bool serial) {
-	if (clear) {
-		lcd.clear();
+void lcdPrint(String text, int line, int col, bool clearLine, bool serial) {
+	if (clearLine) {
+		lcdPrint("                ", line, 0, false, serial);
 	}
 
 	lcd.setCursor(col, line);

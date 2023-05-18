@@ -11,14 +11,13 @@ void registerAP(const char* ssid, const char* password) {
 
 bool connectToWifi() {
 	attempt = 0;
-	lcdPrint("Connecting to");
-	lcdPrint("wifi...", 1);
+	lcdPrint("Wifi.. ");
 	WiFi.mode(WIFI_STA);
 	while (wifiMulti.run() != WL_CONNECTED) {
 		if (attempt > connectMaxAttempts) {
 			return false;
 		}
-		lcdPrint(String(attempt) + "/" + String(connectMaxAttempts), 1, 8);
+		lcdPrint(String(attempt) + "/" + String(connectMaxAttempts), 0, 9);
 		delay(100);
 		attempt++;
 	}
