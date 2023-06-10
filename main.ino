@@ -22,7 +22,7 @@ DHTesp dht;
 
 bool wifiConnected = false;
 
-#define TEMPARATURE_OFFSET -1.05
+#define TEMPARATURE_OFFSET -4.0
 
 
 void setup()
@@ -140,14 +140,8 @@ void loop()
 	if (co2ppm > 0){
 		mqttClient.publish(co2_topic, String(co2ppm).c_str(), true);
 	}
+	// Sleep for 1 minute
+	delay(60000);
 
-	// Upload to influx db
-	if (influxClient.validateConnection()){
-		// lcdPrint("Y", 1, 15);
-		uploadWifiStatus(WiFi.SSID(), WiFi.RSSI());
-		uploadAirQuality(temperature, humidity, co2ppm);
-	}else{
-		// lcdPrint("N", 1, 15);
-	}	
 }
 
